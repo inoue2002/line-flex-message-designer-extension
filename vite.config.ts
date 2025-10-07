@@ -24,7 +24,8 @@ const copyStaticPlugin = {
 
     const manifestRaw = await readFile(resolve(rootDir, 'manifest.json'), 'utf-8');
     const manifest = JSON.parse(manifestRaw);
-    const adjust = (value) => (typeof value === 'string' ? value.replace(/^src\//, '') : value);
+    const adjust = (value: unknown) =>
+      typeof value === 'string' ? value.replace(/^(?:src|dist)\//, '') : value;
 
     manifest.action.default_popup = adjust(manifest.action.default_popup);
     manifest.background.service_worker = adjust(manifest.background.service_worker);

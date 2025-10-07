@@ -4,11 +4,11 @@
   "description": "Design and preview LINE Flex Messages directly from a Chrome popup UI.",
   "version": "0.1.0",
   "action": {
-    "default_popup": "src/popup/index.html",
+    "default_popup": "dist/popup/index.html",
     "default_title": "LINE Flex Message Designer"
   },
   "background": {
-    "service_worker": "src/background/service-worker.js"
+    "service_worker": "dist/background/service-worker.js"
   },
   "permissions": [
     "storage"
@@ -22,7 +22,7 @@
         "https://developers.line.biz/flex-simulator/*"
       ],
       "js": [
-        "src/content/inject.js"
+        "dist/content/inject.js"
       ],
       "run_at": "document_idle"
     }
