@@ -64,6 +64,7 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
 
   return {
+    base: './',
     root: popupRoot,
     plugins: [cleanPlugin, react(), copyStaticPlugin],
     build: {
