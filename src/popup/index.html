@@ -6,32 +6,17 @@
     <link rel="stylesheet" href="../styles/popup.css" />
   </head>
   <body>
-    <header>
-      <h1>Flex Message Designer</h1>
-      <button id="saveTemplate">テンプレートを保存</button>
-    </header>
     <main>
       <section class="settings">
-        <label for="apiKeyInput">OpenAI API キー</label>
+        <h1>OpenAI API キー</h1>
+        <p class="hint">ChatGPT 連携に使用する OpenAI API キーを保存します。キーはローカルストレージにのみ保持されます。</p>
         <div class="api-key-row">
           <input id="apiKeyInput" type="password" placeholder="sk-..." autocomplete="off" />
           <button id="saveApiKey">保存</button>
         </div>
-        <p id="apiKeyStatus" class="hint">未保存</p>
-      </section>
-      <section class="editor">
-        <label for="flexJson">Flex Message JSON</label>
-        <textarea id="flexJson" spellcheck="false" placeholder="{\n  \"type\": \"flex\",\n  ...\n}"></textarea>
-      </section>
-      <section class="preview">
-        <header>
-          <h2>プレビュー</h2>
-          <button id="copyJson">JSONをコピー</button>
-        </header>
-        <pre id="preview"></pre>
-        <p id="error" hidden></p>
+        <p id="apiKeyStatus" class="status">未保存</p>
       </section>
     </main>
+    <script src="popup.js" type="module"></script>
   </body>
-  <script src="popup.js" type="module"></script>
 </html>

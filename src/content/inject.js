@@ -115,7 +115,7 @@
       if (!applyResult.ok) {
         setStatus('JSON は生成しましたが自動貼り付けに失敗しました: ' + applyResult.error, true);
       } else {
-        setStatus('シミュレーターへ JSON を貼り付けて Apply を実行しました。', false);
+        setStatus('シミュレーターへ JSON を貼り付けて反映しました。', false, 2000);
       }
 
       try {
@@ -138,9 +138,24 @@
     buttonEl.textContent = isLoading ? '生成中...' : '生成';
   }
 
-  function setStatus(message, isError) {
+  let statusTimer = null;
+
+  function setStatus(message, isError, timeoutMs) {
     statusEl.textContent = message;
     statusEl.classList.toggle('error', Boolean(isError));
+
+    if (statusTimer) {
+      clearTimeout(statusTimer);
+      statusTimer = null;
+    }
+
+    if (!isError && typeof timeoutMs === 'number' && timeoutMs > 0) {
+      statusTimer = setTimeout(() => {
+        statusEl.textContent = '';
+        statusEl.classList.remove('error');
+        statusTimer = null;
+      }, timeoutMs);
+    }
   }
 
   async function applyToSimulator(json) {
