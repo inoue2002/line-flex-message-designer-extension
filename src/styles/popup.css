@@ -1,0 +1,141 @@
+:root {
+  color-scheme: light dark;
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 400px;
+  min-height: 520px;
+  background: #f5f8f5;
+  color: #0b2f15;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(90deg, #00c300, #00e676);
+  color: white;
+}
+
+header h1 {
+  font-size: 16px;
+  margin: 0;
+}
+
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 12px 16px 16px;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.settings .api-key-row {
+  display: flex;
+  gap: 8px;
+}
+
+.settings input[type='password'] {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+}
+
+.settings .hint {
+  font-size: 12px;
+  margin: 0;
+  color: #4f4f4f;
+}
+
+.editor textarea {
+  width: 100%;
+  min-height: 220px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-family: 'Fira Code', 'Source Code Pro', monospace;
+  font-size: 12px;
+  resize: vertical;
+  background: white;
+}
+
+.preview pre {
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #0b2f15;
+  color: #e8ffe8;
+  font-family: 'Fira Code', 'Source Code Pro', monospace;
+  font-size: 12px;
+  min-height: 160px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.preview header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+button {
+  appearance: none;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.25);
+  color: inherit;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+#saveTemplate {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+#saveTemplate:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+#error {
+  color: #c62828;
+  font-size: 12px;
+  margin: 0;
+}
+
+#apiKeyStatus.saved {
+  color: #1b5e20;
+}
+
+#apiKeyStatus.error {
+  color: #c62828;
+}
