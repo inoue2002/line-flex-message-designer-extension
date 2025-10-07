@@ -26,5 +26,6 @@ Google Chrome 向けの拡張機能です。拡張ポップアップでは OpenA
 ## 開発メモ
 - Flex シミュレーター用の追加 UI とロジックは `src/content/inject.js` に定義されています。
 - ChatGPT API 呼び出しロジックは `src/background/service-worker.js` に実装されています。必要に応じてモデル名やプロンプトを調整してください。
+- バックグラウンド・コンテンツスクリプトは TypeScript (`src/background/`, `src/content/`) で実装され、ビルド時に `dist/` へトランスパイルされます。
 - ポップアップは API キー設定のみを扱い、`src/popup/` 以下に実装されています。Tailwind のエントリーポイントは `src/popup/tailwind.css` です。
 - `npm run dev` はポップアップの React/Tailwind をウォッチします。背景スクリプトやマニフェストを変更した場合は `npm run build` で `dist/` を再生成してください。

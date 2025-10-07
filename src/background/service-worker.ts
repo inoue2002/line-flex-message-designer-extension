@@ -1,3 +1,9 @@
+import type {
+  FlexTemplate,
+  GenerateFlexMessageRequest,
+  GenerateFlexMessageResponse
+} from '../types/messages';
+
 const FLEX_TEMPLATE_KEY = 'flexTemplate';
 const API_KEY_STORAGE_KEY = 'openaiApiKey';
 
@@ -5,20 +11,26 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('LINE Flex Message Designer installed');
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.type === 'GENERATE_FLEX_MESSAGE') {
-    handleGenerateFlexMessage(message.prompt ?? '')
-      .then(sendResponse)
-      .catch((error) => {
-        console.error('Failed to generate Flex message', error);
-        sendResponse({ ok: false, error: error.message || 'Unknown error' });
-      });
-    return true; // keep message channel open for async response
+chrome.runtime.onMessage.addListener(
+  (message: GenerateFlexMessageRequest, _sender, sendResponse: (response: GenerateFlexMessageResponse) => void) => {
+    if (message?.type === 'GENERATE_FLEX_MESSAGE') {
+      handleGenerateFlexMessage(message.prompt ?? '', message.baseTemplate ?? null)
+        .then(sendResponse)
+        .catch((error: unknown) => {
+          console.error('Failed to generate Flex message', error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          sendResponse({ ok: false, error: errorMessage });
+        });
+      return true; // keep message channel open for async response
+    }
+    return undefined;
   }
-  return undefined;
-});
+);
 
-async function handleGenerateFlexMessage(prompt) {
+async function handleGenerateFlexMessage(
+  prompt: string,
+  baseTemplate: FlexTemplate | null
+): Promise<GenerateFlexMessageResponse> {
   const { [API_KEY_STORAGE_KEY]: apiKey } = await chrome.storage.local.get(API_KEY_STORAGE_KEY);
 
   if (!apiKey) {
@@ -27,6 +39,21 @@ async function handleGenerateFlexMessage(prompt) {
 
   const trimmedPrompt = prompt.trim();
   const userInstruction = trimmedPrompt.length > 0 ? trimmedPrompt : 'ユーザーにおすすめの Flex メッセージを1つ作成してください。';
+  const baseTemplateString = baseTemplate ? JSON.stringify(baseTemplate, null, 2) : null;
+
+  const userSections: string[] = [];
+
+  if (baseTemplateString) {
+    userSections.push(
+      '以下の既存 Flex Message JSON を改善または拡張してください。必要に応じてボタンやテキスト、画像などを調整しても構いませんが、LINE Messaging API の Flex Message 仕様に準拠する JSON を返してください。'
+    );
+    userSections.push(baseTemplateString);
+    userSections.push('改善リクエスト:');
+  } else {
+    userSections.push('Flex Message を次の条件で作ってください:');
+  }
+
+  userSections.push(userInstruction);
 
   const body = {
     model: 'gpt-4o-mini',
@@ -38,7 +65,7 @@ async function handleGenerateFlexMessage(prompt) {
       },
       {
         role: 'user',
-        content: `Flex Message を次の条件で作ってください:\n${userInstruction}`
+        content: userSections.join('\n\n')
       }
     ]
   };
@@ -58,7 +85,15 @@ async function handleGenerateFlexMessage(prompt) {
     return { ok: false, error: message };
   }
 
-  const data = await response.json();
+  interface OpenAIChoice {
+    message?: { content?: string };
+  }
+
+  interface OpenAIResponsePayload {
+    choices?: OpenAIChoice[];
+  }
+
+  const data = (await response.json()) as OpenAIResponsePayload;
   const rawContent = data?.choices?.[0]?.message?.content;
 
   if (!rawContent) {
@@ -89,12 +124,24 @@ async function handleGenerateFlexMessage(prompt) {
   };
 }
 
-function stripCodeFences(content) {
+function stripCodeFences(content: string | undefined): string {
   if (!content) return '';
   return content.replace(/```json\s*([\s\S]*?)```/gi, '$1').replace(/```([\s\S]*?)```/g, '$1');
 }
 
-function tryParseJson(text) {
+interface ParseSuccess {
+  ok: true;
+  value: FlexTemplate;
+}
+
+interface ParseFailure {
+  ok: false;
+  error: unknown;
+}
+
+type ParseResult = ParseSuccess | ParseFailure;
+
+function tryParseJson(text: string): ParseResult {
   try {
     return { ok: true, value: JSON.parse(text) };
   } catch (error) {
@@ -102,7 +149,7 @@ function tryParseJson(text) {
   }
 }
 
-async function safeReadJson(response) {
+async function safeReadJson(response: Response): Promise<any | null> {
   try {
     return await response.json();
   } catch (error) {

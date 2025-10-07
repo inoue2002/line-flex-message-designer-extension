@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve, join } from 'path';
+import { resolve, join, dirname } from 'path';
 import { rm, cp, mkdir, readFile, writeFile } from 'fs/promises';
+import { build as esbuild } from 'esbuild';
 
 const rootDir = __dirname;
 const popupRoot = resolve(rootDir, 'src/popup');
@@ -34,10 +35,29 @@ const copyStaticPlugin = {
 
     await writeFile(resolve(distRoot, 'manifest.json'), JSON.stringify(manifest, null, 2));
     await cp(resolve(rootDir, 'assets'), resolve(distRoot, 'assets'), { recursive: true });
-    await cp(resolve(rootDir, 'src/background'), resolve(distRoot, 'background'), { recursive: true });
-    await cp(resolve(rootDir, 'src/content'), resolve(distRoot, 'content'), { recursive: true });
+
+    await Promise.all([
+      compileScript(
+        resolve(rootDir, 'src/background/service-worker.ts'),
+        resolve(distRoot, 'background/service-worker.js')
+      ),
+      compileScript(resolve(rootDir, 'src/content/inject.ts'), resolve(distRoot, 'content/inject.js'))
+    ]);
   }
 };
+
+async function compileScript(entry: string, outfile: string): Promise<void> {
+  await mkdir(dirname(outfile), { recursive: true });
+  await esbuild({
+    entryPoints: [entry],
+    outfile,
+    bundle: false,
+    format: 'esm',
+    platform: 'browser',
+    target: ['chrome110'],
+    sourcemap: false
+  });
+}
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
