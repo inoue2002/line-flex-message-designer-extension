@@ -31,6 +31,158 @@ type OperationFailure = { ok: false; error: string };
 type OperationResult<T extends object = object> = OperationSuccess<T> | OperationFailure;
 
 const STORAGE_KEY = 'flexTemplate';
+const DEFAULT_TEMPLATE: FlexTemplate = {
+  type: 'bubble',
+  hero: {
+    type: 'image',
+    url: 'https://developers-resource.landpress.line.me/fx/img/01_1_cafe.png',
+    size: 'full',
+    aspectRatio: '20:13',
+    aspectMode: 'cover',
+    action: {
+      type: 'uri',
+      uri: 'https://line.me/'
+    }
+  },
+  body: {
+    type: 'box',
+    layout: 'vertical',
+    contents: [
+      {
+        type: 'text',
+        text: 'Brown Cafe',
+        weight: 'bold',
+        size: 'xl'
+      },
+      {
+        type: 'box',
+        layout: 'baseline',
+        margin: 'md',
+        contents: [
+          {
+            type: 'icon',
+            size: 'sm',
+            url: 'https://developers-resource.landpress.line.me/fx/img/review_gold_star_28.png'
+          },
+          {
+            type: 'icon',
+            size: 'sm',
+            url: 'https://developers-resource.landpress.line.me/fx/img/review_gold_star_28.png'
+          },
+          {
+            type: 'icon',
+            size: 'sm',
+            url: 'https://developers-resource.landpress.line.me/fx/img/review_gold_star_28.png'
+          },
+          {
+            type: 'icon',
+            size: 'sm',
+            url: 'https://developers-resource.landpress.line.me/fx/img/review_gold_star_28.png'
+          },
+          {
+            type: 'icon',
+            size: 'sm',
+            url: 'https://developers-resource.landpress.line.me/fx/img/review_gray_star_28.png'
+          },
+          {
+            type: 'text',
+            text: '4.0',
+            size: 'sm',
+            color: '#999999',
+            margin: 'md',
+            flex: 0
+          }
+        ]
+      },
+      {
+        type: 'box',
+        layout: 'vertical',
+        margin: 'lg',
+        spacing: 'sm',
+        contents: [
+          {
+            type: 'box',
+            layout: 'baseline',
+            spacing: 'sm',
+            contents: [
+              {
+                type: 'text',
+                text: 'Place',
+                color: '#aaaaaa',
+                size: 'sm',
+                flex: 1
+              },
+              {
+                type: 'text',
+                text: 'Flex Tower, 7-7-4 Midori-ku, Tokyo',
+                wrap: true,
+                color: '#666666',
+                size: 'sm',
+                flex: 5
+              }
+            ]
+          },
+          {
+            type: 'box',
+            layout: 'baseline',
+            spacing: 'sm',
+            contents: [
+              {
+                type: 'text',
+                text: 'Time',
+                color: '#aaaaaa',
+                size: 'sm',
+                flex: 1
+              },
+              {
+                type: 'text',
+                text: '10:00 - 23:00',
+                wrap: true,
+                color: '#666666',
+                size: 'sm',
+                flex: 5
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  footer: {
+    type: 'box',
+    layout: 'vertical',
+    spacing: 'sm',
+    contents: [
+      {
+        type: 'button',
+        style: 'link',
+        height: 'sm',
+        action: {
+          type: 'uri',
+          label: 'CALL',
+          uri: 'https://line.me/'
+        }
+      },
+      {
+        type: 'button',
+        style: 'link',
+        height: 'sm',
+        action: {
+          type: 'uri',
+          label: 'WEBSITE',
+          uri: 'https://line.me/'
+        }
+      },
+      {
+        type: 'box',
+        layout: 'vertical',
+        contents: [],
+        margin: 'sm'
+      }
+    ],
+    flex: 0
+  }
+};
 
 interface PanelElements {
   container: HTMLDivElement;
@@ -65,15 +217,7 @@ let panel: PanelElements | null = null;
   });
 
   panel.resetButton.addEventListener('click', () => {
-    includeExistingTemplate = !includeExistingTemplate;
-    updateResetButton();
-    setStatus(
-      includeExistingTemplate
-        ? '既存 JSON を含めて生成します。'
-        : '次回は既存 JSON を含めず生成します。',
-      false,
-      2000
-    );
+    void handleResetClick();
   });
 
   updateResetButton();
@@ -237,6 +381,45 @@ async function generateFlexMessage(): Promise<void> {
       includeExistingTemplate = true;
       updateResetButton();
     }
+  }
+}
+
+async function handleResetClick(): Promise<void> {
+  if (!panel) return;
+  includeExistingTemplate = false;
+  updateResetButton();
+  const previousLabel = panel.generateButton.textContent;
+
+  panel.generateButton.disabled = true;
+  panel.resetButton.disabled = true;
+  panel.generateButton.textContent = 'リセット中...';
+  setStatus('初期テンプレートを適用しています...', false);
+
+  try {
+    const prettyJson = JSON.stringify(DEFAULT_TEMPLATE, null, 2);
+    await chrome.storage.local.set({ [STORAGE_KEY]: DEFAULT_TEMPLATE });
+
+    const applyResult = await applyToSimulator(prettyJson);
+    if (!applyResult.ok) {
+      throw new Error(applyResult.error);
+    }
+
+    try {
+      await navigator.clipboard.writeText(prettyJson);
+    } catch (err) {
+      console.warn('Failed to copy default template to clipboard', err);
+    }
+
+    setStatus('初期テンプレートを表示しました。次回生成では既存 JSON を送信しません。', false, 2500);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    setStatus('リセットに失敗しました: ' + message, true);
+    includeExistingTemplate = true;
+    updateResetButton();
+  } finally {
+    panel.generateButton.disabled = false;
+    panel.resetButton.disabled = false;
+    panel.generateButton.textContent = previousLabel ?? '生成';
   }
 }
 
