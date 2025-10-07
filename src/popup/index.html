@@ -3,20 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <title>LINE Flex Message Designer</title>
-    <link rel="stylesheet" href="../styles/popup.css" />
   </head>
   <body>
-    <main>
-      <section class="settings">
-        <h1>OpenAI API キー</h1>
-        <p class="hint">ChatGPT 連携に使用する OpenAI API キーを保存します。キーはローカルストレージにのみ保持されます。</p>
-        <div class="api-key-row">
-          <input id="apiKeyInput" type="password" placeholder="sk-..." autocomplete="off" />
-          <button id="saveApiKey">保存</button>
-        </div>
-        <p id="apiKeyStatus" class="status">未保存</p>
-      </section>
-    </main>
-    <script src="popup.js" type="module"></script>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
   </body>
 </html>

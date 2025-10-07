@@ -1,0 +1,28 @@
+{
+  "name": "line-flex-message-designer-extension",
+  "version": "1.0.0",
+  "description": "Google Chrome 向けの拡張機能です。拡張ポップアップでは OpenAI API キーだけを設定し、LINE 公式 Flex シミュレーター上では左下の入力欄から ChatGPT API へリクエストして Flex メッセージ JSON を自動生成・反映できます。",
+  "main": "index.js",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.22",
+    "@types/react": "^19.2.1",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9"
+  }
+}

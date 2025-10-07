@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    @apply m-0 flex min-h-[220px] w-[360px] justify-center bg-emerald-50 text-emerald-900;
+    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply flex w-full flex-col gap-4 rounded-xl border border-emerald-100 bg-white/95 p-6 shadow-sm;
+  }
+
+  .primary-button {
+    @apply rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-70;
+  }
+
+  .input-field {
+    @apply flex-1 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm text-emerald-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-emerald-400;
+  }
+}
