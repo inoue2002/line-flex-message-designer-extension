@@ -1,5 +1,8 @@
 # LINE Flex Message Designer Extension
 
+![拡張機能のスクリーンショット](assets/image.png)
+
+
 Google Chrome 向けの拡張機能です。拡張ポップアップでは OpenAI API キーだけを設定し、LINE 公式 Flex シミュレーター上では左下の入力欄から ChatGPT API へリクエストして Flex メッセージ JSON を自動生成・反映できます。
 
 ## 機能
